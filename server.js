@@ -35,6 +35,10 @@ So express.json() is a body parser for post request except html post form and ex
 // implementing CORS helps to access numerous functionalities on the browser
 app.use(cors());
 
+app.get("/", (req, res) => {
+  res.render("index");
+});
+
 app.listen(PORT, (_) => {
   console.log(`Server is running on port ${PORT}`);
 });
