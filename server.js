@@ -1,25 +1,24 @@
 // require dependencies
 const express = require("express");
 const cors = require("cors");
-const MongoClient = require("mongodb").MongoClient;
+const mongoose = require("mongoose");
 require("dotenv").config();
 const app = express();
-
-// declare variables
-let db,
-  dbConnectionString = process.env.DB_STRING,
-  dbName = "sample_mflix",
-  collection;
+const TestModel = require("./models/schema");
 
 // create PORT
 const PORT = process.env.PORT || 8000;
 
-// connect to Mongo
-MongoClient.connect(dbConnectionString).then((client) => {
-  console.log(`Connected to ${dbName} database.`);
-  db = client.db(dbName);
-  collection = db.collection("movies");
-});
+// Connect to Mongo
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.DB_STRING, { useNewUrlParser: true });
+    console.log(`Connected to database: ${mongoose.connection.name}`);
+  } catch (err) {
+    console.log("Failed to connect", err);
+  }
+};
+connectDB();
 
 // Middleware
 // set view engine - template engine
@@ -37,7 +36,11 @@ app.use(cors());
 
 app.get("/", async (req, res) => {
   try {
-    res.render("index.ejs");
+    // get data from DB
+    const content = await TestModel.find({});
+    console.log(content);
+    // data is fetched, then render ejs and pass the data so that it can render on the page
+    res.render("index.ejs", { data: content });
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
